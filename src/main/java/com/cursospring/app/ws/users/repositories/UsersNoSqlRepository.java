@@ -13,9 +13,9 @@ public interface UsersNoSqlRepository extends MongoRepository<UsersNoSql, Long> 
 	 */
 	
 	//Buscar en la DB de Mongo un Cliente por Numero de Identificacion
-	public UsersNoSql findByIdSql(String numdoc);
+	public UsersNoSql findByNumdoc(String numdoc);
 	
 	//Eliminar un cliente de la DB de Monto por NUmero de Identificacion
-	public void deleteByIdSql(String numdoc);
+	public void deleteByNumdoc(String numdoc);
 
 }

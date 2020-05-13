@@ -44,15 +44,15 @@ public class UserServiceNoSqlImpl implements UserServiceNoSql {
 	@Transactional
 	public void deleteUser(UsersNoSql user) {
 		// TODO Auto-generated method stub
-		usersNoSQLRepository.deleteByIdSql(user.getNumdoc());
+		usersNoSQLRepository.deleteByNumdoc(user.getNumdoc());
 
 	}
 
 	@Override
 	@Transactional
-	public UsersNoSql findById(String idSql) {
+	public UsersNoSql findById(String numdoc) {
 		// TODO Auto-generated method stub
-		return usersNoSQLRepository.findByIdSql(idSql);
+		return usersNoSQLRepository.findByNumdoc(numdoc);
 	}
 
 	@Override

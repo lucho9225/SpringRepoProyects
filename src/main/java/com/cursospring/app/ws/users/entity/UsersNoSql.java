@@ -16,23 +16,21 @@ public class UsersNoSql {
 	
 
 	public String getImage() {
-		// TODO Auto-generated method stub
 		return image;
 	}
 
 	public void setImage(String image) {
-		// TODO Auto-generated method stub
 		this.image = image;
 	}
 
 	public String getNumdoc() {
-		// TODO Auto-generated method stub
 		return numdoc;
 	}
 
 	public void setNumdoc(String numdoc) {
-		// TODO Auto-generated method stub
 		this.numdoc = numdoc;
 	}
+
+	
 
 }
