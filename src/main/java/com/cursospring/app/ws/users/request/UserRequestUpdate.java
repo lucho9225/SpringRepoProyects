@@ -26,6 +26,8 @@ public class UserRequestUpdate {
 	
 	@NotNull
 	private String ciudadNacimiento;
+	
+	private String image;
 
 	public String getFirstName() {
 		return firstName;
@@ -73,6 +75,14 @@ public class UserRequestUpdate {
 
 	public void setCiudadNacimiento(String ciudadNacimiento) {
 		this.ciudadNacimiento = ciudadNacimiento;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
 	}
 
 }

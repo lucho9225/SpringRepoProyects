@@ -10,34 +10,47 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.cursospring.app.ws.Users;
 import com.cursospring.app.ws.users.request.UserRequestCreate;
 import com.cursospring.app.ws.users.request.UserRequestUpdate;
 import com.cursospring.app.ws.users.response.UserResponse;
+import com.cursospring.app.ws.users.service.IUsers;
+import com.cursospring.app.ws.users.service.IUsersNoSql;
 import com.cursospring.app.ws.users.service.UserService;
 import com.cursospring.app.ws.users.service.UserServiceMapper;
+import com.cursospring.app.ws.users.service.UserServiceNoSql;
 
 @Service
 public class UserServiceImpl implements UserService {
 
 	@Autowired
-	UserServiceMapper mapper;
+	private UserServiceMapper mapper;
 	
-	String dbConexionSource = "hibernate.cfg.xml";
+	@Autowired
+	private Users userIn;
+	
+	@Autowired
+	private UsersNoSql userNoSqlIn;
+	
+	@Autowired
+	private UserServiceNoSql userServiceNoSql;
+	
+	private String dbConexionSource = "hibernate.cfg.xml";
 	
 	@Override
 	public UserResponse createUser(UserRequestCreate userDetails) {
 		// TODO Auto-generated method stub
 		
 		UserResponse userResponse;
-		Users userIn = mapper.mappUserInCreate(userDetails);
+		userIn = mapper.mappUserInCreate(userDetails);
+		userNoSqlIn.setImage(userDetails.getImage());
 		
 		SessionFactory miFactory = new Configuration().configure(dbConexionSource).addAnnotatedClass(Users.class).buildSessionFactory();
 		Session miSession = miFactory.openSession();
 		
 		try {
+			/*   Rutina create en mySQL     */
 			miSession.beginTransaction();
-			miSession.save(userIn); 
+			miSession.save(userIn);
 			miSession.getTransaction().commit();
 			System.out.println("Registro Insertado Correctamente");
 			miSession.beginTransaction();
@@ -45,6 +58,13 @@ public class UserServiceImpl implements UserService {
 			miSession.getTransaction().commit();
 			userResponse = mapper.mappUserOut(userOut);
 			miSession.close();
+			
+			
+			/*   Rutina de guardar la imagen en mongoDB  */
+			userNoSqlIn.setId(userResponse.getId());
+			userServiceNoSql.saveUsersNoSQL(userNoSqlIn);
+			UsersNoSql userNoSqlOut = userServiceNoSql.findById(userNoSqlIn.getId());
+			userResponse.setImage(userNoSqlOut.getImage());
 			
 		}finally {
 			miFactory.close();
@@ -56,7 +76,8 @@ public class UserServiceImpl implements UserService {
 	public UserResponse updateUser(UserRequestUpdate userDetails, long userId) {
 		// TODO Auto-generated method stub
 		UserResponse userResponse;
-		Users userIn = mapper.mappUserInUpdate(userDetails, userId);
+		userIn = mapper.mappUserInUpdate(userDetails, userId);
+		userNoSqlIn = mapper.mappUserNoSqlInUpdate(userDetails,userId);
 		
 		SessionFactory miFactory = new Configuration().configure(dbConexionSource).addAnnotatedClass(Users.class).buildSessionFactory();
 		Session miSession = miFactory.openSession();
@@ -64,16 +85,7 @@ public class UserServiceImpl implements UserService {
 		try {
 			
 			miSession.beginTransaction();
-			miSession.createQuery("update Users "
-					+ "set nombre = '" + userIn.getNombre()+"',"
-					+ "apellido = '" + userIn.getApellido()+"',"
-					+ "tipoDoc = '" + userIn.getTipoDoc()+"',"
-					+ "numdoc = '" + userIn.getNumdoc()+"',"
-					+ "edad = " + userIn.getEdad()+","
-					+ "ciudadNacimiento = '" + userIn.getCiudadNacimiento()+"'"
-					+ " where id = "+ userIn.getId())
-					.executeUpdate();
-			
+			miSession.saveOrUpdate(userIn);			
 			miSession.getTransaction().commit();
 			System.out.println("Registro actualizado correctamente en BBDD");
 			miSession.beginTransaction();
@@ -124,13 +136,7 @@ public class UserServiceImpl implements UserService {
 			userResponseList = miSession.createQuery("from Users us where us.id = "+userId).getResultList();
 			
 			for (Users userResponseTmp:userResponseList) {
-				userResponse.setId(userResponseTmp.getId());
-				userResponse.setFirstName(userResponseTmp.getNombre());
-				userResponse.setLastName(userResponseTmp.getApellido());
-				userResponse.setDocumentType(userResponseTmp.getTipoDoc());
-				userResponse.setDocumentNumber(userResponseTmp.getNumdoc());
-				userResponse.setEdad(userResponseTmp.getEdad());
-				userResponse.setCiudadNacimiento(userResponseTmp.getCiudadNacimiento());
+				userResponse = mapper.mappUserOut(userResponseTmp);
 			}
 			miSession.getTransaction().commit();
 			miSession.close();

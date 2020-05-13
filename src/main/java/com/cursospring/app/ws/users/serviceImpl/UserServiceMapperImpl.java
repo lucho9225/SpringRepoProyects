@@ -1,21 +1,26 @@
 package com.cursospring.app.ws.users.serviceImpl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cursospring.app.ws.Users;
 import com.cursospring.app.ws.users.request.UserRequestCreate;
 import com.cursospring.app.ws.users.request.UserRequestUpdate;
 import com.cursospring.app.ws.users.response.UserResponse;
 import com.cursospring.app.ws.users.service.UserServiceMapper;
+import com.cursospring.app.ws.users.serviceImpl.Users;
 
 @Service
 public class UserServiceMapperImpl implements UserServiceMapper {
 	
+	@Autowired
+	private Users user;
+	
+	@Autowired
+	private UsersNoSql userNoSql;
 	
 	@Override
 	public Users mappUserInCreate(UserRequestCreate userDetails) {
 		// TODO Auto-generated method stub
-		Users user = new Users();
 		
 		user.setNombre(userDetails.getFirstName()); 
 		user.setApellido(userDetails.getLastName());
@@ -59,4 +64,17 @@ public class UserServiceMapperImpl implements UserServiceMapper {
 		return user;
 	}
 
+	@Override
+	public UsersNoSql mappUserNoSqlInUpdate(UserRequestUpdate userDetails, long userId) {
+		
+		userNoSql.setId(userId);
+		userNoSql.setImage(userDetails.getImage());
+			
+		return userNoSql;
+
+	}
+	
 }
+	
+	
+

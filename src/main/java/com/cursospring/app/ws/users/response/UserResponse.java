@@ -16,6 +16,8 @@ public class UserResponse {
 	private String ciudadNacimiento;
 	
 	private long id;
+	
+	private String image;
 
 	public String getFirstName() {
 		return firstName;
@@ -71,6 +73,14 @@ public class UserResponse {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
 	}
 	
 }
