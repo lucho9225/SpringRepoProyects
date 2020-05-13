@@ -2,15 +2,16 @@ package com.cursospring.app.ws.users.service;
 
 import java.util.List;
 
-import com.cursospring.app.ws.users.serviceImpl.UsersNoSql;;
+import com.cursospring.app.ws.users.entity.UsersNoSql;
+import com.cursospring.app.ws.users.request.UserRequestCreate;;
 
 public interface UserServiceNoSql {
 
-	public void saveUsersNoSQL(UsersNoSql user);
+	public void saveUsersNoSQL(UserRequestCreate user, String documentNumber);
 	
 	public void deleteUser(UsersNoSql user);
 	
-	public UsersNoSql findById(Long id);
+	public UsersNoSql findById(String id);
 	
 	public List<UsersNoSql> findAll();
 	

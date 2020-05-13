@@ -21,10 +21,8 @@ public class UserRequestCreate {
 	@Size(min=6,max=15)
 	private String documentNumber;
 	
-	@NotNull
 	private int edad;
 	
-	@NotNull
 	private String ciudadNacimiento;
 	
 	private String image;

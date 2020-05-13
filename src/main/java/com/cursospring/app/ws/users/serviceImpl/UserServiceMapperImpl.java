@@ -1,21 +1,19 @@
 package com.cursospring.app.ws.users.serviceImpl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cursospring.app.ws.users.entity.Users;
+import com.cursospring.app.ws.users.entity.UsersNoSql;
 import com.cursospring.app.ws.users.request.UserRequestCreate;
 import com.cursospring.app.ws.users.request.UserRequestUpdate;
 import com.cursospring.app.ws.users.response.UserResponse;
 import com.cursospring.app.ws.users.service.UserServiceMapper;
-import com.cursospring.app.ws.users.serviceImpl.Users;
 
 @Service
 public class UserServiceMapperImpl implements UserServiceMapper {
-	
-	@Autowired
+
 	private Users user;
-	
-	@Autowired
+
 	private UsersNoSql userNoSql;
 	
 	@Override
@@ -63,11 +61,21 @@ public class UserServiceMapperImpl implements UserServiceMapper {
 		
 		return user;
 	}
+	
+	@Override
+	public UsersNoSql mappUserNoSqlInCreate(UserRequestCreate userDetails, String userId) {
+		
+		userNoSql.setNumdoc(userId);
+		userNoSql.setImage(userDetails.getImage());
+			
+		return userNoSql;
+
+	}
 
 	@Override
-	public UsersNoSql mappUserNoSqlInUpdate(UserRequestUpdate userDetails, long userId) {
+	public UsersNoSql mappUserNoSqlInUpdate(UserRequestUpdate userDetails, String userId) {
 		
-		userNoSql.setId(userId);
+		userNoSql.setNumdoc(userId);
 		userNoSql.setImage(userDetails.getImage());
 			
 		return userNoSql;

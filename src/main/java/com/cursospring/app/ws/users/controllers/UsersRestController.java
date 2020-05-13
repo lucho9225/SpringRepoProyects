@@ -22,6 +22,7 @@ import com.cursospring.app.ws.users.request.UserRequestCreate;
 import com.cursospring.app.ws.users.request.UserRequestUpdate;
 import com.cursospring.app.ws.users.response.UserResponse;
 import com.cursospring.app.ws.users.service.UserService;
+import com.cursospring.app.ws.users.service.UserServiceNoSql;
 
 @RestController
 @RequestMapping(path="/users")
@@ -29,6 +30,9 @@ public class UsersRestController {
 	
 	@Autowired
 	UserService user;
+	
+	@Autowired
+	UserServiceNoSql userNoSql;
 	
 	@GetMapping( produces = {MediaType.APPLICATION_JSON_VALUE})
 	public List<UserResponse> getUsers(
@@ -58,11 +62,10 @@ public class UsersRestController {
 	}
 	
 	@PostMapping(consumes= {MediaType.APPLICATION_JSON_VALUE},produces= {MediaType.APPLICATION_JSON_VALUE})
-	public UserResponse postUser(@Valid @RequestBody UserRequestCreate userDetails) {
+	public void postUser(@Valid @RequestBody UserRequestCreate userDetails) {
 		
-		UserResponse userResponse = user.createUser(userDetails);
-		
-		return userResponse;
+		user.createUser(userDetails);
+		userNoSql.saveUsersNoSQL(userDetails, userDetails.getDocumentNumber());
 	}
 	
 	@PutMapping(path="/{userId}",consumes= {MediaType.APPLICATION_JSON_VALUE},produces= {MediaType.APPLICATION_JSON_VALUE})

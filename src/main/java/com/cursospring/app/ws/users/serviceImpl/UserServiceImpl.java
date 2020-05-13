@@ -3,21 +3,17 @@ package com.cursospring.app.ws.users.serviceImpl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.cursospring.app.ws.users.entity.Users;
+import com.cursospring.app.ws.users.repositories.UsersSqlRepository;
 import com.cursospring.app.ws.users.request.UserRequestCreate;
 import com.cursospring.app.ws.users.request.UserRequestUpdate;
 import com.cursospring.app.ws.users.response.UserResponse;
-import com.cursospring.app.ws.users.service.IUsers;
-import com.cursospring.app.ws.users.service.IUsersNoSql;
 import com.cursospring.app.ws.users.service.UserService;
 import com.cursospring.app.ws.users.service.UserServiceMapper;
-import com.cursospring.app.ws.users.service.UserServiceNoSql;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -26,50 +22,23 @@ public class UserServiceImpl implements UserService {
 	private UserServiceMapper mapper;
 	
 	@Autowired
+	private UsersSqlRepository userSqlRepository;
+
 	private Users userIn;
 	
-	@Autowired
-	private UsersNoSql userNoSqlIn;
-	
-	@Autowired
-	private UserServiceNoSql userServiceNoSql;
-	
-	private String dbConexionSource = "hibernate.cfg.xml";
-	
 	@Override
-	public UserResponse createUser(UserRequestCreate userDetails) {
+	public void createUser(UserRequestCreate userDetails) {
 		// TODO Auto-generated method stub
-		
-		UserResponse userResponse;
 		userIn = mapper.mappUserInCreate(userDetails);
-		userNoSqlIn.setImage(userDetails.getImage());
-		
-		SessionFactory miFactory = new Configuration().configure(dbConexionSource).addAnnotatedClass(Users.class).buildSessionFactory();
-		Session miSession = miFactory.openSession();
 		
 		try {
 			/*   Rutina create en mySQL     */
-			miSession.beginTransaction();
-			miSession.save(userIn);
-			miSession.getTransaction().commit();
+			userSqlRepository.save(userIn);
 			System.out.println("Registro Insertado Correctamente");
-			miSession.beginTransaction();
-			Users userOut = miSession.get(Users.class, userIn.getId());
-			miSession.getTransaction().commit();
-			userResponse = mapper.mappUserOut(userOut);
-			miSession.close();
-			
-			
-			/*   Rutina de guardar la imagen en mongoDB  */
-			userNoSqlIn.setId(userResponse.getId());
-			userServiceNoSql.saveUsersNoSQL(userNoSqlIn);
-			UsersNoSql userNoSqlOut = userServiceNoSql.findById(userNoSqlIn.getId());
-			userResponse.setImage(userNoSqlOut.getImage());
 			
 		}finally {
-			miFactory.close();
+			
 		}
-		return userResponse;
 	}
 
 	@Override
@@ -77,25 +46,14 @@ public class UserServiceImpl implements UserService {
 		// TODO Auto-generated method stub
 		UserResponse userResponse;
 		userIn = mapper.mappUserInUpdate(userDetails, userId);
-		userNoSqlIn = mapper.mappUserNoSqlInUpdate(userDetails,userId);
-		
-		SessionFactory miFactory = new Configuration().configure(dbConexionSource).addAnnotatedClass(Users.class).buildSessionFactory();
-		Session miSession = miFactory.openSession();
 		
 		try {
-			
-			miSession.beginTransaction();
-			miSession.saveOrUpdate(userIn);			
-			miSession.getTransaction().commit();
+			Users userOut = userSqlRepository.save(userIn);	
 			System.out.println("Registro actualizado correctamente en BBDD");
-			miSession.beginTransaction();
-			Users userOut = miSession.get(Users.class, userIn.getId());
-			miSession.getTransaction().commit();
 			userResponse = mapper.mappUserOut(userOut);	
-			miSession.close();
 			
 		}finally {
-			miFactory.close();
+			
 		}
 		return userResponse;
 	}
@@ -103,46 +61,25 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public HttpStatus deleteUser(long userId) {
 		// TODO Auto-generated method stub
-		
-		Boolean exitoso=Boolean.FALSE;
-		SessionFactory miFactory = new Configuration().configure(dbConexionSource).addAnnotatedClass(Users.class).buildSessionFactory();
-		Session miSession = miFactory.openSession();
-		
 		try {
-			miSession.beginTransaction();
-			miSession.createQuery("delete Users where id = "+userId).executeUpdate();
-			miSession.getTransaction().commit();
+			userSqlRepository.deleteById(userId);
 			System.out.println("Registro borrado correctamente de BBDD");
-			exitoso = Boolean.TRUE;
-			miSession.close();
+			return HttpStatus.NO_CONTENT;
 			
-		}finally {
-			miFactory.close();
+		}catch (IllegalArgumentException e) {
+			return HttpStatus.NOT_FOUND;
 		}
-		if(exitoso)return HttpStatus.NO_CONTENT;
-		else return HttpStatus.BAD_REQUEST;
 	}
 
 	@Override
 	public UserResponse getUser(long userId) {
 		// TODO Auto-generated method stub
 		UserResponse userResponse = new UserResponse();
-		List<Users> userResponseList;
-		
-		SessionFactory miFactory = new Configuration().configure(dbConexionSource).addAnnotatedClass(Users.class).buildSessionFactory();
-		Session miSession = miFactory.openSession();
 		try {
-			miSession.beginTransaction();
-			userResponseList = miSession.createQuery("from Users us where us.id = "+userId).getResultList();
-			
-			for (Users userResponseTmp:userResponseList) {
-				userResponse = mapper.mappUserOut(userResponseTmp);
-			}
-			miSession.getTransaction().commit();
-			miSession.close();
-			
+			if(userSqlRepository.findById(userId).isPresent()) userResponse = mapper.mappUserOut(userSqlRepository.findById(userId).get());
+			else return null;//Lanzar una excepción posiblemente con httpStatus o personalizada
 		}finally {
-			miFactory.close();
+			
 		}		
 		return userResponse;
 	}
@@ -153,31 +90,17 @@ public class UserServiceImpl implements UserService {
 		List<UserResponse> userResponseOutList = new ArrayList<UserResponse>();
 		List<Users> userResponseList;
 		
-		SessionFactory miFactory = new Configuration().configure(dbConexionSource).addAnnotatedClass(Users.class).buildSessionFactory();
-		Session miSession = miFactory.openSession();
-		
 		try {
-			miSession.beginTransaction();
-			userResponseList = miSession.createQuery("from Users us where us.tipoDoc = '"+tipoDoc+"' and numdoc= '"+numdoc+"'").getResultList();
+			userResponseList = userSqlRepository.findByDoc(tipoDoc,numdoc);
 			
 			for (Users userResponseTmp:userResponseList) {
 				UserResponse userResponse = new UserResponse();
-				userResponse.setId(userResponseTmp.getId());
-				userResponse.setFirstName(userResponseTmp.getNombre());
-				userResponse.setLastName(userResponseTmp.getApellido());
-				userResponse.setDocumentType(userResponseTmp.getTipoDoc());
-				userResponse.setDocumentNumber(userResponseTmp.getNumdoc());
-				userResponse.setEdad(userResponseTmp.getEdad());
-				userResponse.setCiudadNacimiento(userResponseTmp.getCiudadNacimiento());
-				
+				userResponse = mapper.mappUserOut(userResponseTmp);
+		
 				userResponseOutList.add(userResponse);
-				
 			}
-			miSession.getTransaction().commit();
-			miSession.close();
-			
 		}finally {
-			miFactory.close();
+			
 		}
 		
 		return userResponseOutList;
@@ -188,31 +111,18 @@ public class UserServiceImpl implements UserService {
 		
 		List<UserResponse> userResponseOutList = new ArrayList<UserResponse>();
 		List<Users> userResponseList;
-		SessionFactory miFactory = new Configuration().configure(dbConexionSource).addAnnotatedClass(Users.class).buildSessionFactory();
-		Session miSession = miFactory.openSession();
 		
 		try {
-			miSession.beginTransaction();
-			userResponseList = miSession.createQuery("from Users us where us.edad >= "+edad).getResultList();
+			userResponseList = userSqlRepository.findByAge(edad);
 			
 			for (Users userResponseTmp:userResponseList) {
 				UserResponse userResponse = new UserResponse();
-				userResponse.setId(userResponseTmp.getId());
-				userResponse.setFirstName(userResponseTmp.getNombre());
-				userResponse.setLastName(userResponseTmp.getApellido());
-				userResponse.setDocumentType(userResponseTmp.getTipoDoc());
-				userResponse.setDocumentNumber(userResponseTmp.getNumdoc());
-				userResponse.setEdad(userResponseTmp.getEdad());
-				userResponse.setCiudadNacimiento(userResponseTmp.getCiudadNacimiento());
-				
+				userResponse = mapper.mappUserOut(userResponseTmp);
+		
 				userResponseOutList.add(userResponse);
-				
 			}
-			miSession.getTransaction().commit();
-			miSession.close();
-			
 		}finally {
-			miFactory.close();
+			
 		}
 		
 		return userResponseOutList;
@@ -223,31 +133,18 @@ public class UserServiceImpl implements UserService {
 		
 		List<UserResponse> userResponseOutList = new ArrayList<UserResponse>();
 		List<Users> userResponseList;
-		SessionFactory miFactory = new Configuration().configure(dbConexionSource).addAnnotatedClass(Users.class).buildSessionFactory();
-		Session miSession = miFactory.openSession();
 		
 		try {
-			miSession.beginTransaction();
-			userResponseList = miSession.createQuery(" from Users").setMaxResults(limit).getResultList();
+			userResponseList = userSqlRepository.findWithLimit(limit);
 			
 			for (Users userResponseTmp:userResponseList) {
 				UserResponse userResponse = new UserResponse();
-				userResponse.setId(userResponseTmp.getId());
-				userResponse.setFirstName(userResponseTmp.getNombre());
-				userResponse.setLastName(userResponseTmp.getApellido());
-				userResponse.setDocumentType(userResponseTmp.getTipoDoc());
-				userResponse.setDocumentNumber(userResponseTmp.getNumdoc());
-				userResponse.setEdad(userResponseTmp.getEdad());
-				userResponse.setCiudadNacimiento(userResponseTmp.getCiudadNacimiento());
-				
+				userResponse = mapper.mappUserOut(userResponseTmp);
+		
 				userResponseOutList.add(userResponse);
-				
-			}
-			miSession.getTransaction().commit();
-			miSession.close();
-			
+			}			
 		}finally {
-			miFactory.close();
+
 		}
 		
 		return userResponseOutList;

@@ -1,4 +1,4 @@
-package com.cursospring.app.ws.users.serviceImpl;
+package com.cursospring.app.ws.users.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -7,11 +7,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.cursospring.app.ws.users.service.IUsers;
 
 @Entity
 @Table(name="users")
-public class Users implements IUsers {
+public class Users  {
 
 	@Column(name="nombre")
 	private String nombre;
@@ -50,77 +49,62 @@ public class Users implements IUsers {
 		this.ciudadNacimiento = ciudadNacimiento;
 	}
 
-	@Override
 	public String getNombre() {
 		return nombre;
 	}
 
-	@Override
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
 
-	@Override
 	public String getApellido() {
 		return apellido;
 	}
 
-	@Override
 	public void setApellido(String apellido) {
 		this.apellido = apellido;
 	}
 
-	@Override
 	public String getTipoDoc() {
 		return tipoDoc;
 	}
 
-	@Override
 	public void setTipoDoc(String tipoDoc) {
 		this.tipoDoc = tipoDoc;
 	}
 
-	@Override
 	public String getNumdoc() {
 		return numdoc;
 	}
 
-	@Override
 	public void setNumdoc(String numdoc) {
 		this.numdoc = numdoc;
 	}
 
-	@Override
 	public int getEdad() {
 		return edad;
 	}
 
-	@Override
 	public void setEdad(int edad) {
 		this.edad = edad;
 	}
 
-	@Override
 	public String getCiudadNacimiento() {
 		return ciudadNacimiento;
 	}
 
-	@Override
 	public void setCiudadNacimiento(String ciudadNacimiento) {
 		this.ciudadNacimiento = ciudadNacimiento;
 	}
 
-	@Override
 	public long getId() {
 		return id;
 	}
-	
-	@Override
+
 	public void setId(long id) {
 		this.id = id;
 	}
 
-	@Override
 	public String toString() {
 		return "Users [nombre=" + nombre + ", apellido=" + apellido + ", tipoDoc=" + tipoDoc + ", numdoc=" + numdoc
 				+ ", edad=" + edad + ", ciudadNacimiento=" + ciudadNacimiento + ", id=" + id + "]";

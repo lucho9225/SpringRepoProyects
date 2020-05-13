@@ -10,7 +10,7 @@ import com.cursospring.app.ws.users.response.UserResponse;
 
 public interface UserService {
 	
-	public UserResponse createUser(UserRequestCreate userDetails);
+	public void createUser(UserRequestCreate userDetails);
 	
 	public UserResponse updateUser(UserRequestUpdate userDetails, long userId);
 	

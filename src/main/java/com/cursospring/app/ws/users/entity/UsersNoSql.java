@@ -1,44 +1,38 @@
-package com.cursospring.app.ws.users.serviceImpl;
+package com.cursospring.app.ws.users.entity;
 
 import javax.persistence.Id;
 
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.cursospring.app.ws.users.service.IUsersNoSql;
-
-@Document(collection = "clients")
-public class UsersNoSql implements IUsersNoSql {
+@Document(collection = "users")
+public class UsersNoSql {
 
 	private String image;
 	
 	@Id
 	@Indexed(unique = true)
-	private long id;
+	private String numdoc;
 	
-	
-	@Override
+
 	public String getImage() {
 		// TODO Auto-generated method stub
 		return image;
 	}
 
-	@Override
 	public void setImage(String image) {
 		// TODO Auto-generated method stub
 		this.image = image;
 	}
 
-	@Override
-	public long getId() {
+	public String getNumdoc() {
 		// TODO Auto-generated method stub
-		return id;
+		return numdoc;
 	}
 
-	@Override
-	public void setId(long id) {
+	public void setNumdoc(String numdoc) {
 		// TODO Auto-generated method stub
-		this.id = id;
+		this.numdoc = numdoc;
 	}
 
 }

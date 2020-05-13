@@ -1,30 +1,23 @@
 package com.cursospring.app.ws.users.request;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class UserRequestUpdate {
-	
-	@NotNull(message="El nombre del usuario es requerido")
+
 	@Size(min=2,max=30)
 	private String firstName;
-	
-	@NotNull(message="El apellido del usuario es requerido")
+
 	@Size(min=2,max=30)
 	private String lastName;
 	
-	@NotNull(message="El tipo de documento es requerido")
 	@Size(min=2,max=3)
 	private String documentType;
 	
-	@NotNull
 	@Size(min=6,max=15)
 	private String documentNumber;
 	
-	@NotNull
 	private int edad;
 	
-	@NotNull
 	private String ciudadNacimiento;
 	
 	private String image;
