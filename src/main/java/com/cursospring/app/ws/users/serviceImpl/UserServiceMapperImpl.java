@@ -1,5 +1,6 @@
 package com.cursospring.app.ws.users.serviceImpl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cursospring.app.ws.users.entity.Users;
@@ -12,9 +13,9 @@ import com.cursospring.app.ws.users.service.UserServiceMapper;
 @Service
 public class UserServiceMapperImpl implements UserServiceMapper {
 
-	private Users user;
+	private Users user = new Users();
 
-	private UsersNoSql userNoSql;
+	private UsersNoSql userNoSql = new UsersNoSql();
 	
 	@Override
 	public Users mappUserInCreate(UserRequestCreate userDetails) {

@@ -57,6 +57,7 @@ public class UsersRestController {
 	public UserResponse getUser(@PathVariable long userId) {
 		
 		UserResponse userResponse = user.getUser(userId);
+		userResponse.setImage(userNoSql.findById(userResponse.getDocumentNumber()).getImage());
 		
 		return userResponse;
 	}

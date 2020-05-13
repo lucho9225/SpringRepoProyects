@@ -31,6 +31,7 @@ public class UserServiceNoSqlImpl implements UserServiceNoSql {
 	private MongoTemplate mongoTemplate;
 	
 	@Override
+	@Transactional
 	public void saveUsersNoSQL(UserRequestCreate userRequest,String documentNumber) {
 		
 		userIn = mapper.mappUserNoSqlInCreate(userRequest,documentNumber);
