@@ -122,9 +122,7 @@ public class UserServiceImpl implements UserService {
 				userResponseOutList.add(userResponse);
 			}
 		}finally {
-			
 		}
-		
 		return userResponseOutList;
 	}
 	

@@ -3,10 +3,12 @@ package com.cursospring.app.ws.users.request;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.Email;
+
 public class UserRequestCreate {
 	
 	@NotNull(message="El nombre del usuario es requerido")
-	@Size(min=2,max=30)
+	@Size(min=2,max=30, message="el nombre debe ser mayor a 2 caracteres")
 	private String firstName;
 	
 	@NotNull(message="El apellido del usuario es requerido")
@@ -17,8 +19,8 @@ public class UserRequestCreate {
 	@Size(min=2,max=3)
 	private String documentType;
 	
-	@NotNull
-	@Size(min=6,max=15)
+	@NotNull(message="El número del documento no debe estar nulo")
+	@Size(min=6,max=15,message="El número del documento debe ser de al menos 6 caracteres")
 	private String documentNumber;
 	
 	private int edad;
